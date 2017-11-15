@@ -8,6 +8,10 @@ describe('tests differencify', () => {
   });
   afterAll(async () => {
     await differencify.cleanup();
+    differencify.generateReport({
+      html: 'index.html',
+      json: 'report.json',
+    });
   });
   it('validate github page appear correctly', async () => {
     await differencify

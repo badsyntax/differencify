@@ -6,7 +6,8 @@ import functionToString from './helpers/functionToString';
 import freezeImage from './freezeImage';
 
 export default class Page {
-  constructor(browser, testConfig, globalConfig) {
+  constructor(browser, testConfig, globalConfig, reporter) {
+    this.reporter = reporter;
     this.globalConfig = globalConfig;
     this.testConfig = testConfig;
     this.browser = browser;
@@ -129,6 +130,11 @@ export default class Page {
       try {
         result = await compareImage(this.image, this.globalConfig, this.testConfig);
       } catch (error) {
+        this.reporter.addResult({
+          outcome: false,
+          testName: test.name,
+          result: error.message,
+        });
         this._logError(error);
       }
       if (this.error) {

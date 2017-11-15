@@ -3,13 +3,15 @@ import chainProxy from './helpers/proxyChain';
 import { sanitiseGlobalConfiguration, sanitiseTestConfiguration } from './sanitiser';
 import Page from './page';
 import logger from './utils/logger';
+import Reporter from './utils/reporter';
 
 export default class Differencify {
-  constructor(conf) {
+  constructor(conf, reporter) {
     if (conf && conf.debug === true) {
       logger.enable();
     }
     this.configuration = sanitiseGlobalConfiguration(conf);
+    this.reporter = reporter || new Reporter(this.configuration);
     this.browser = null;
     this.testId = 0;
   }
@@ -33,7 +35,7 @@ export default class Differencify {
     if (testConfig.isUpdate) {
       logger.warn('Your tests are running on update mode. Test screenshots will be updated');
     }
-    const page = new Page(this.browser, testConfig, this.configuration);
+    const page = new Page(this.browser, testConfig, this.configuration, this.reporter);
     if (testConfig.chain) {
       return chainProxy(page);
     }

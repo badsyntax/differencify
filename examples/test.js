@@ -10,7 +10,7 @@ const differencify = new Differencify({ debug: true });
     .capture()
     .close()
     .end();
-  
+
   // or unchained
 
   const page = await differencify.init({ chain: false });
@@ -21,4 +21,9 @@ const differencify = new Differencify({ debug: true });
   result = await page.close();
 
   console.log(result); // Prints true or false
+
+  differencify.generateReport({
+    html: 'index.html',
+    json: 'report.json',
+  });
 })();
