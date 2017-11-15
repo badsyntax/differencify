@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import logger from './utils/logger';
 
-const compareImage = async (capturedImage, globalConfig, testConfig) => {
+const compareImage = async (capturedImage, globalConfig, testConfig, reporter) => {
   const prefixedLogger = logger.prefix(testConfig.testName);
   let testRoot;
   if (testConfig.isJest) {
@@ -40,7 +40,13 @@ const compareImage = async (capturedImage, globalConfig, testConfig) => {
     const distance = Jimp.distance(snapshotImage, testImage);
     const diff = Jimp.diff(snapshotImage, testImage, globalConfig.mismatchThreshold);
     if (distance < globalConfig.mismatchThreshold && diff.percent < globalConfig.mismatchThreshold) {
-      prefixedLogger.log('no mismatch found ✅');
+      const result = 'no mismatch found ✅';
+      prefixedLogger.log(result);
+      reporter.addResult({
+        outcome: true,
+        testName: testConfig.testName,
+        result,
+      });
       return { matched: true };
     }
     if (globalConfig.saveDifferencifiedImage) {

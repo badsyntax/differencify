@@ -20,6 +20,9 @@ jest.mock('path', () => ({
   resolve: jest.fn(() => 'dir'),
 }));
 
+const mockReporter = {
+  addResult: jest.fn(),
+};
 const mockLog = jest.fn();
 const mockError = jest.fn();
 jest.mock('./utils/logger', () => ({
@@ -29,6 +32,7 @@ jest.mock('./utils/logger', () => ({
   })),
 }));
 
+jest.mock('./utils/reporter');
 const mockConfig = {
   imageSnapshotPath: './differencify_report',
   saveDifferencifiedImage: true,
@@ -57,7 +61,7 @@ describe('Compare Image', () => {
         testName: 'test',
         testPath: '/src/test.js',
         imageType: 'png',
-      });
+      }, mockReporter);
       expect(result).toEqual({ added: true });
       expect(fs.writeFileSync).toHaveBeenCalledWith('/parent/__image_snapshots__/test.snap.png', Object);
     });
@@ -68,7 +72,7 @@ describe('Compare Image', () => {
         testName: 'test',
         testPath: '/src/test.js',
         imageType: 'png',
-      });
+      }, mockReporter);
       expect(result).toEqual({ updated: true });
       expect(fs.writeFileSync).toHaveBeenCalledWith('/parent/__image_snapshots__/test.snap.png', Object);
     });
@@ -82,7 +86,7 @@ describe('Compare Image', () => {
         testName: 'test',
         testPath: '/src/test.js',
         imageType: 'png',
-      });
+      }, mockReporter);
       expect(result).toEqual({ added: true });
       expect(fs.writeFileSync)
       .toHaveBeenCalledWith(
@@ -97,7 +101,7 @@ describe('Compare Image', () => {
         testName: 'test',
         testPath: '/src/test.js',
         imageType: 'png',
-      });
+      }, mockReporter);
       expect(result).toEqual({ updated: true });
       expect(fs.writeFileSync)
       .toHaveBeenCalledWith(
@@ -111,7 +115,7 @@ describe('Compare Image', () => {
     expect.assertions(2);
     Jimp.read.mockReturnValueOnce(Promise.reject('error1'));
     fs.existsSync.mockReturnValueOnce(true);
-    const result = await compareImage(Object, mockConfig, mockTestConfig);
+    const result = await compareImage(Object, mockConfig, mockTestConfig, mockReporter);
     expect(result).toEqual({ matched: false });
     expect(mockError).toHaveBeenCalledWith('failed to read reference image error1');
   });
@@ -119,7 +123,7 @@ describe('Compare Image', () => {
   it('returns correct value if difference below threshold', async () => {
     expect.assertions(2);
     fs.existsSync.mockReturnValueOnce(true);
-    const result = await compareImage(Object, mockConfig, mockTestConfig);
+    const result = await compareImage(Object, mockConfig, mockTestConfig, mockReporter);
     expect(result).toEqual({ matched: true });
     expect(mockLog).toHaveBeenCalledWith('no mismatch found ✅');
   });
@@ -132,7 +136,7 @@ describe('Compare Image', () => {
       },
     });
     fs.existsSync.mockReturnValueOnce(true);
-    const result = await compareImage(Object, mockConfig, mockTestConfig);
+    const result = await compareImage(Object, mockConfig, mockTestConfig, mockReporter);
     expect(result).toEqual({
       diffPath: '/parent/__image_snapshots__/__differencified_output__/test.differencified.png',
       matched: false,
@@ -154,7 +158,7 @@ describe('Compare Image', () => {
       },
     });
     fs.existsSync.mockReturnValueOnce(true);
-    const result = await compareImage(Object, mockConfig, mockTestConfig);
+    const result = await compareImage(Object, mockConfig, mockTestConfig, mockReporter);
     expect(result).toEqual({
       diffPath: '/parent/__image_snapshots__/__differencified_output__/test.differencified.png',
       matched: false,
@@ -176,7 +180,7 @@ describe('Compare Image', () => {
       },
     });
     fs.existsSync.mockReturnValueOnce(true);
-    const result = await compareImage(Object, mockConfig, mockTestConfig);
+    const result = await compareImage(Object, mockConfig, mockTestConfig, mockReporter);
     expect(result).toEqual({
       diffPath: '/parent/__image_snapshots__/__differencified_output__/test.differencified.png',
       matched: false,
@@ -205,6 +209,7 @@ describe('Compare Image', () => {
       // eslint-disable-next-line prefer-object-spread/prefer-object-spread
       Object.assign({}, mockConfig, { saveDifferencifiedImage: true }),
       mockTestConfig,
+      mockReporter,
     );
     expect(result).toEqual({
       diffPath: '/parent/__image_snapshots__/__differencified_output__/test.differencified.png',

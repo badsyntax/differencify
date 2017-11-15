@@ -7,6 +7,10 @@ import { sanitiseGlobalConfiguration } from './sanitiser';
 import jestMatchers from './utils/jestMatchers';
 import compareImage from './compareImage';
 
+const mockReporter = {
+  addResult: jest.fn(),
+};
+
 const mockMatcher = jest.fn(() => ({
   message: 'message',
   pass: true,
@@ -59,7 +63,7 @@ jest.mock('./utils/logger', () => ({
 }));
 
 const browser = puppeteer.launch();
-const page = new Page(browser, testConfig, sanitiseGlobalConfiguration(globalConfig));
+const page = new Page(browser, testConfig, sanitiseGlobalConfiguration(globalConfig), mockReporter);
 
 describe('Page', () => {
   afterEach(() => {

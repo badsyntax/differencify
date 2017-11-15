@@ -128,14 +128,14 @@ export default class Page {
     if (!this.error) {
       let result;
       try {
-        result = await compareImage(this.image, this.globalConfig, this.testConfig);
+        result = await compareImage(this.image, this.globalConfig, this.testConfig, this.reporter);
       } catch (error) {
+        this._logError(error);
         this.reporter.addResult({
           outcome: false,
-          testName: test.name,
+          testName: this.testConfig.name,
           result: error.message,
         });
-        this._logError(error);
       }
       if (this.error) {
         return false;
