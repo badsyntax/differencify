@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer';
 import chainProxy from './helpers/proxyChain';
 import Differencify from './index';
 import logger from './utils/logger';
+import Reporter from './utils/reporter';
 import Page from './page';
 
 jest.mock('./page');
@@ -22,7 +23,15 @@ jest.mock('./utils/logger', () => ({
   warn: jest.fn(),
 }));
 
-const differencify = new Differencify();
+jest.mock('./utils/reporter');
+
+Reporter.mockImplementation(() => ({
+  generate: jest.fn(),
+}));
+
+const mockReporter = new Reporter();
+
+const differencify = new Differencify(null, mockReporter);
 
 describe('Differencify', () => {
   afterEach(() => {
@@ -80,7 +89,7 @@ describe('Differencify', () => {
         },
         saveDifferencifiedImage: true,
         imageSnapshotPath: 'differencify_reports',
-      });
+      }, mockReporter);
     expect(chainProxy).toHaveBeenCalledTimes(0);
     expect(logger.warn).toHaveBeenCalledWith('Your tests are running on update mode. Test screenshots will be updated');
     delete process.env.update;
@@ -101,5 +110,13 @@ describe('Differencify', () => {
       expect(differencify.browser).toBeNull();
       expect(logger.log).toHaveBeenCalledWith('Closing browser...');
     });
+  });
+  describe('generateReport fn', () => {
+    const config = {
+      html: 'index.html',
+      json: 'asset-manifest.json',
+    };
+    differencify.generateReport(config);
+    expect(mockReporter.generate).toHaveBeenCalledWith(config);
   });
 });

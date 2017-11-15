@@ -26,8 +26,8 @@ const getImagePath = (files, file) =>
   (files.indexOf(file) !== -1 ? file : null);
 
 export default class Reporter {
-  constructor(options = {}) {
-    this.options = options;
+  constructor(configuration) {
+    this.configuration = configuration;
     this.results = [];
   }
 
@@ -40,8 +40,8 @@ export default class Reporter {
   }
 
   getResults() {
-    const { testReportPath, saveDifferencifiedImage } = this.options;
-    const images = getImages(testReportPath);
+    const { imageSnapshotPath, saveDifferencifiedImage } = this.configuration;
+    const images = getImages(imageSnapshotPath);
     return this.results.map(result =>
       // eslint-disable-next-line prefer-object-spread/prefer-object-spread
       Object.assign(
@@ -57,14 +57,16 @@ export default class Reporter {
     );
   }
 
-  generate(types, testReportPath) {
+  generate(types) {
     Object.keys(types).forEach((type) => {
-      const filepath = path.join(testReportPath, types[type]);
+      const filepath = path.join(this.configuration.imageSnapshotPath, types[type]);
       try {
         const template = getReport(type, this.getResults());
+        console.log('SAVE REPORT', filepath);
         saveReport(filepath, template);
         logger.log(`Generated ${type} report at ${filepath}`);
       } catch (err) {
+        console.log(err);
         logger.error(
           `Unable to generate ${type} report at ${filepath}: ${err}`,
         );

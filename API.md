@@ -5,6 +5,7 @@
 |`launchBrowser`|no argument|Launches a browser instance with [GlobalOptions](https://github.com/NimaSoroush/differencify#globaloptions). The browser will be closed when the parent node.js process is closed|
 |`init`|[TestOptions](https://github.com/NimaSoroush/differencify#testoptions)|Launches a browser instance if there is no instance already been launched or launches new browser window if `newWindow:true`|
 |`cleanup`|no argument|Closes browser instance if it is not closed already|
+|`generateReport`|Config object, for example: `{ html: 'index.html' }`|Generates a report file. Supports `html` and `json` report types|
 
 ### Steps Methods
 

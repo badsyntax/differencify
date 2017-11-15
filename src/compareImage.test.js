@@ -32,7 +32,6 @@ jest.mock('./utils/logger', () => ({
   })),
 }));
 
-jest.mock('./utils/reporter');
 const mockConfig = {
   imageSnapshotPath: './differencify_report',
   saveDifferencifiedImage: true,

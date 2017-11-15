@@ -52,4 +52,8 @@ export default class Differencify {
       logger.error(error);
     }
   }
+
+  generateReport(config) {
+    this.reporter.generate(config);
+  }
 }
